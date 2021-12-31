@@ -1,6 +1,12 @@
 const fs = require('fs');
 const path = require("path");
-
+const _ = require('lodash');
+let logData = []
+try {
+    logData = require('./data/logger.json');
+} catch (e) {
+    // console.log(e.message)
+}
 const writeData = (filename, content) => {
     fs.writeFile(filename, JSON.stringify(content, null, 4), 'utf8', (err) => {
         if (err) console.log(err);
@@ -57,15 +63,17 @@ async function saveImg(req, res, file) {
 
 async function saveImgs(req, res, fieldnames = ['file']) {
     try {
-        if (req.files.length !== fieldnames.length) {
+        if (_.isEmpty(req.files)) {
+            res.status(400).send({ message: `Bad request: please send ${fieldnames.join(', ')}` });
+            req.files = [];
+        } else if (req.files.length !== fieldnames.length) {
             for (let i = 0; req.files.length > i; i++) {
                 // Delete cache
                 const resUnlik = await unlink(req.files[i].path);
                 if (!resUnlik) handleError('', res);
             }
             res.status(400).send({ message: `Bad request: please send ${fieldnames.join(', ')}` });
-        }
-        else {
+        } else {
             let imgs = {}
             // check fieldname
             for (let i = 0; fieldnames.length > i; i++) {
@@ -100,11 +108,27 @@ function unlink(tempPath) {
         })
     })
 }
+
+function logger(text, { status = "INFO", filename = "./data/logger.json", res = '' }) {
+    logData.push({ [status]: text, date: `${formatDate('mm/dd/yyyy')} ${getTime()}` });
+    if (res) res.status(500).send({ message: "Something wrong!" });
+    fs.writeFile(filename, JSON.stringify(logData, null, 4), 'utf8', (err) => {
+        if (err) console.log(err);
+    });
+}
+
+function errorHandle(res, message, status = 500) {
+    logger(`${e.message}`, { status: 'ERROR', res });
+    res.status(status).send({ message });
+}
+
 // ********************************************************
 module.exports = {
     writeData,
     rename,
     unlink,
     saveImg,
-    saveImgs
+    saveImgs,
+    logger,
+    errorHandle
 }
