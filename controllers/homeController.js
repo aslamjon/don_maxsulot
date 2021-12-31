@@ -83,7 +83,7 @@ async function deleteCard(req, res) {
         let card = await CardOfHomeModel.findByIdAndDelete(id);
         if (!card) res.status(404).send({ message: "a card not found", uz: "Card topilmadi" });
         else {
-            let filePath = path.join(__dirname, `./../data/${card.img.replace('/api/files/', '')}`);
+            let filePath = path.join(__dirname, `./../data/images/${card.img.replace('/api/files/', '')}`);
             let file = await unlink(filePath);
             res.send({ message: "a card has been deleted", uz: "Card o'chirildi" });
         }
