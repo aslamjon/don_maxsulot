@@ -7,25 +7,29 @@ async function createWareHouse(req, res) {
         let { typeOfProduct, kg, price, isDebt } = req.body;
         if (!typeOfProduct && !kg && !price && isDebt && isNumber(kg) && isNumber(price)) res.status(400).send({ message: "Bad request" });
         else {
-            let totalDebt = 0;
-            kg = toFixed(kg);
-            if (isDebt) {
-                let total = kg * price;
-                if (isFloat(total)) totalDebt = toFixed(total);
-                else totalDebt = total;
+            const getItem = WareHouseModel.find({ typeOfProduct });
+            if (getItem) res.send({ message: "product is already created", uz: "Mahsulot alaqachon omborda mavjud" });
+            else {
+                let totalDebt = 0;
+                kg = toFixed(kg);
+                if (isDebt) {
+                    let total = kg * price;
+                    if (isFloat(total)) totalDebt = toFixed(total);
+                    else totalDebt = total;
+                }
+                const wareHouse = WareHouseModel({
+                    typeOfProduct,
+                    kg,
+                    currentlyKg: kg,
+                    price,
+                    datePublished: formatDate("mm/dd/yyyy"),
+                    timePublished: getTime(24),
+                    totalDebt,
+                    totalLeadDebt: totalDebt
+                });
+                await wareHouse.save();
+                res.send({ message: "item has been saved in WareHouse", uz: "Ma'lumot muvofiqlik saqlandi" });
             }
-            const wareHouse = WareHouseModel({
-                typeOfProduct,
-                kg,
-                currentlyKg: kg,
-                price,
-                datePublished: formatDate("mm/dd/yyyy"),
-                timePublished: getTime(24),
-                totalDebt,
-                totalLeadDebt: totalDebt
-            });
-            await wareHouse.save();
-            res.send({ message: "item has been saved in WareHouse", uz: "Ma'lumot muvofiqlik saqlandi" });
         }
     } catch (e) {
         errorHandle(res, e.message);

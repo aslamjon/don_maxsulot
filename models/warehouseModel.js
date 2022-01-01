@@ -4,6 +4,7 @@ const schema = new Schema({
     typeOfProduct: {
         type: String,
         required: true,
+        unique: true
     },
     kg: {
         type: Number,
