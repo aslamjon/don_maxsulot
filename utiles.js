@@ -108,6 +108,55 @@ function unlink(tempPath) {
         })
     })
 }
+// ************************- encoding and decoding -********************************
+const encodingBase64 = filePath => {
+    const file = fs.readFileSync(filePath, { encoding: 'base64' });
+    // return file.toString('base64');
+    return file;
+};
+
+const decodingBase64 = (data, fileName) => {
+    let buff = new Buffer.from(data, 'base64');
+    fs.writeFileSync(fileName, buff)
+}
+// **********************************- date format -************************************************
+
+function formatDate(format, date = new Date()) {
+    const map = {
+        mm: date.getMonth() + 1,
+        dd: date.getDate(),
+        yy: date.getFullYear().toString().slice(-2),
+        yyyy: date.getFullYear()
+    }
+    return format.replace(/mm|dd|yyyy|yy/gi, matched => map[matched])
+    return date.toLocaleDateString("en-US");
+}
+
+function ISODate(date = new Date()) {
+    return date.toISOString();
+}
+
+function setYear(year, date = new Date()) {
+    let Year = new Date().setFullYear(year);
+    return new Date(Year);
+}
+
+function getTime(format = 24, date = new Date()) {
+    if (format == 24) return date.toUTCString().split(" ")[4];
+    else return date.toLocaleString().split(" ")[1];
+}
+
+function isInt(n) {
+    return Number(n) === n && n % 1 === 0;
+}
+
+function isFloat(n) {
+    return Number(n) === n && n % 1 !== 0;
+}
+
+function toFixed(number, n = 2) {
+    return Number(Number(number).toFixed(n));
+}
 
 function logger(text, { status = "INFO", filename = "./data/logger.json", res = '' }) {
     logData.push({ [status]: text, date: `${formatDate('mm/dd/yyyy')} ${getTime()}` });
@@ -118,7 +167,7 @@ function logger(text, { status = "INFO", filename = "./data/logger.json", res = 
 }
 
 function errorHandle(res, message, status = 500) {
-    logger(`${e.message}`, { status: 'ERROR', res });
+    logger(`${message}`, { status: 'ERROR', res });
     res.status(status).send({ message });
 }
 
@@ -130,5 +179,14 @@ module.exports = {
     saveImg,
     saveImgs,
     logger,
-    errorHandle
+    errorHandle,
+    isInt,
+    isFloat,
+    toFixed,
+    encodingBase64,
+    decodingBase64,
+    formatDate,
+    ISODate,
+    setYear,
+    getTime
 }
