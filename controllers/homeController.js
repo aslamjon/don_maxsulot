@@ -70,7 +70,7 @@ async function updateCard(req, res) {
                 price: price || card.price,
                 showToAgent: showToAgent || card.showToAgent
             });
-            res.send({ message: "card has been updated", uz: "Card muvofiqlik yanqilandi" });
+            res.send({ message: "card has been updated", uz: "Card muvofiqlik yangilandi" });
         }
     } catch (e) {
         errorHandle(res, e.message);
