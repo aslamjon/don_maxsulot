@@ -4,13 +4,12 @@ const schema = new Schema({
     typeOfProduct: {
         type: String,
         required: true,
-        unique: true
     },
     kg: {
         type: Number,
         required: true
     },
-    currentlyKg: {
+    sellingPrice: {
         type: Number,
         required: true
     },
@@ -54,12 +53,12 @@ const schema = new Schema({
         type: String,
         default: ''
     },
-    byWhom: {
+    toWhom: {
         type: String,
         required: true
     }
 })
 
 module.exports = {
-    WareHouseModel: model('WareHouse', schema)
+    BazaarModel: model('Bazaar', schema)
 }

@@ -1,14 +1,15 @@
 const { isNumber, isEmpty } = require("lodash");
-const { TradingPointModel } = require("../models/tradingPointModel");
+const { BazaarModel } = require("../models/bazaarModel");
 const { WareHouseModel } = require("../models/warehouseModel");
 const { errorHandle, formatDate, getTime, isFloat, toFixed } = require('./../utiles');
 
-async function createTradingPoint(req, res) {
+async function createBazaar(req, res) {
     try {
         let { typeOfProduct, kg, sellingPrice, isDebt, toWhom } = req.body;
         if (!typeOfProduct && !kg && !sellingPrice && toWhom && isNumber(kg) && isNumber(sellingPrice)) res.status(400).send({ message: "Bad request" });
         else {
             const product = await WareHouseModel.findOne({ typeOfProduct });
+            let bazzar = await BazaarModel.findOne({ typeOfProduct, toWhom, sellingPrice });
             if (product) {
                 let totalDebt = 0;
                 kg = toFixed(kg);
@@ -19,24 +20,44 @@ async function createTradingPoint(req, res) {
                 }
                 const isRight = product.currentlyKg - kg;
                 if (isRight < 0) {
-                    res.send({ message: "You have entered more than the kg available in the warehouse", uz: "Omborda buncha mahsulot mavjud emas" })
+                    res.send({ message: "You have entered more than the kg available in the warehouse", uz: `Omborda buncha mahsulot mavjud emas` });
                 }
                 else {
-                    const TradingPoint = TradingPointModel({
-                        typeOfProduct,
-                        kg,
-                        sellingPrice,
-                        price: product.price,
-                        datePublished: formatDate("mm/dd/yyyy"),
-                        timePublished: getTime(24),
-                        totalDebt,
-                        totalRemainDebt: totalDebt,
-                        toWhom
-                    });
+                    // if there was product
+                    if (bazzar) {
+                        bazzar.kg += kg;
+                        bazzar.datePublished = formatDate("mm/dd/yyyy");
+                        bazzar.timePublished = getTime(24);
+                        // if there was debt
+                        if (bazzar.totalRemainDebt > 0) {
+                            // if agan get product by debt
+                            if (isDebt) {
+                                bazzar.totalDebt += totalDebt;
+                                bazzar.totalLeadDebt += totalDebt;
+                            }
+                        } else {
+                            if (isDebt) {
+                                bazzar.totalDebt += totalDebt;
+                                bazzar.totalLeadDebt += totalDebt;
+                            }
+                        }
+                    } else {
+                        bazzar = BazaarModel({
+                            typeOfProduct,
+                            kg,
+                            sellingPrice,
+                            price: product.price,
+                            datePublished: formatDate("mm/dd/yyyy"),
+                            timePublished: getTime(24),
+                            totalDebt,
+                            totalRemainDebt: totalDebt,
+                            toWhom
+                        });
+                    }
                     product.currentlyKg = isRight;
                     await product.save();
-                    await TradingPoint.save();
-                    res.send({ message: "item has been saved in TradingPoint", uz: "Ma'lumot muvofiqlik saqlandi" });
+                    await bazzar.save();
+                    res.send({ message: "item has been saved in Bazaar", uz: "Ma'lumot muvofiqlik saqlandi" });
                 }
             } else res.status(404).send({ message: "Product not found", uz: "Mahsulot topilmadi" });
         }
@@ -45,18 +66,18 @@ async function createTradingPoint(req, res) {
     }
 }
 
-async function getTradingPoints(req, res) {
+async function getBazaars(req, res) {
     try {
         let { skip, limit } = req.query;
         skip = Number(skip);
         limit = Number(limit);
         let result = {}
         if (skip <= limit) {
-            result.items = await TradingPointModel.find().skip(skip).limit(limit);
-            result.count = await TradingPointModel.find().count();
+            result.items = await BazaarModel.find().skip(skip).limit(limit);
+            result.count = await BazaarModel.find().count();
             res.send(result);
         } else {
-            const items = await TradingPointModel.find();
+            const items = await BazaarModel.find();
             res.send(items);
         }
     } catch (e) {
@@ -64,10 +85,10 @@ async function getTradingPoints(req, res) {
     }
 }
 
-async function getTradingPoint(req, res) {
+async function getBazaar(req, res) {
     try {
         const { id } = req.params;
-        const items = await TradingPointModel.findById(id);
+        const items = await BazaarModel.findById(id);
         if (!items) res.status(404).send({ message: "data not found", uz: "Ma'lumot topilmadi" });
         else res.send(items);
     } catch (e) {
@@ -75,11 +96,11 @@ async function getTradingPoint(req, res) {
     }
 }
 
-async function updateTradingPoint(req, res) {
+async function updateBazaar(req, res) {
     try {
         const { id } = req.params;
-        let { typeOfProduct, kg, sellingPrice } = req.body;
-        const item = await TradingPointModel.findById(id);
+        let { typeOfProduct, kg, sellingPrice, byWhom, isDebt } = req.body;
+        const item = await BazaarModel.findById(id);
         if (isEmpty(item)) res.statsu(404).send({ message: "Item not found", uz: "Ma'lumot topilmadi" });
         else {
             const product = await WareHouseModel.findOne({ typeOfProduct: item.typeOfProduct });
@@ -98,11 +119,14 @@ async function updateTradingPoint(req, res) {
                     item.totalDebt += (item.kg - kg) * sellingPrice;
                 }
             }
-            const updateItems = await TradingPointModel.findByIdAndUpdate(id, {
+            const updateItems = await BazaarModel.findByIdAndUpdate(id, {
                 typeOfProduct: typeOfProduct || item.typeOfProduct,
                 kg,
                 sellingPrice: sellingPrice || item.sellingPrice,
                 isChanged: true,
+                byWhom: byWhom || item.byWhom,
+                modifiedDate: formatDate("mm/dd/yyyy"),
+                modifiedTime: getTime(24)
             });
             await product.save();
             await item.save();
@@ -113,10 +137,10 @@ async function updateTradingPoint(req, res) {
     }
 }
 
-async function deleteTradingPoint(req, res) {
+async function deleteBazaar(req, res) {
     try {
         const { id } = req.params;
-        let item = await TradingPointModel.findByIdAndDelete(id);
+        let item = await BazaarModel.findByIdAndDelete(id);
         if (!item) res.status(404).send({ message: "a data not found", uz: "Ma'lumot topilmadi" });
         else res.send({ message: "a data has been deleted", uz: "Ma'lumot o'chirildi" });
     } catch (e) {
@@ -125,9 +149,9 @@ async function deleteTradingPoint(req, res) {
 }
 
 module.exports = {
-    createTradingPoint,
-    getTradingPoints,
-    getTradingPoint,
-    updateTradingPoint,
-    deleteTradingPoint
+    createBazaar,
+    getBazaars,
+    getBazaar,
+    updateBazaar,
+    deleteBazaar
 }

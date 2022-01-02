@@ -4,20 +4,36 @@ const { errorHandle, formatDate, getTime, isFloat, toFixed } = require('./../uti
 
 async function createWareHouse(req, res) {
     try {
-        let { typeOfProduct, kg, price, isDebt } = req.body;
-        if (!typeOfProduct && !kg && !price && isDebt && isNumber(kg) && isNumber(price)) res.status(400).send({ message: "Bad request" });
+        let { typeOfProduct, kg, price, isDebt, byWhom } = req.body;
+        if (!typeOfProduct && !kg && !price && !byWhom && isNumber(kg) && isNumber(price)) res.status(400).send({ message: "Bad request" });
         else {
-            const getItem = await WareHouseModel.find({ typeOfProduct });
-            if (!isEmpty(getItem)) res.send({ message: "product is already created", uz: "Mahsulot alaqachon omborda mavjud" });
-            else {
-                let totalDebt = 0;
-                kg = toFixed(kg);
-                if (isDebt) {
-                    let total = kg * price;
-                    if (isFloat(total)) totalDebt = toFixed(total);
-                    else totalDebt = total;
+            let wareHouse = await WareHouseModel.findOne({ typeOfProduct, byWhom, price });
+            let totalDebt = 0;
+            kg = toFixed(kg);
+            if (isDebt) {
+                let total = kg * price;
+                if (isFloat(total)) totalDebt = toFixed(total);
+                else totalDebt = total;
+            }
+            if (!isEmpty(wareHouse)) {
+                wareHouse.kg += kg;
+                wareHouse.currentlyKg += kg;
+                wareHouse.datePublished = formatDate("mm/dd/yyyy");
+                wareHouse.timePublished = getTime(24);
+                if (wareHouse.totalRemainDebt > 0) {
+                    if (isDebt) {
+                        wareHouse.totalDebt += totalDebt;
+                        wareHouse.totalRemainDebt += totalDebt;
+                    }
+                } else {
+                    if (isDebt) {
+                        wareHouse.totalDebt += totalDebt;
+                        wareHouse.totalRemainDebt += totalDebt;
+                    }
                 }
-                const wareHouse = WareHouseModel({
+            }
+            else {
+                wareHouse = WareHouseModel({
                     typeOfProduct,
                     kg,
                     currentlyKg: kg,
@@ -25,11 +41,12 @@ async function createWareHouse(req, res) {
                     datePublished: formatDate("mm/dd/yyyy"),
                     timePublished: getTime(24),
                     totalDebt,
-                    totalRemainDebt: totalDebt
+                    totalRemainDebt: totalDebt,
+                    byWhom
                 });
-                await wareHouse.save();
-                res.send({ message: "item has been saved in WareHouse", uz: "Ma'lumot muvofiqlik saqlandi" });
             }
+            await wareHouse.save();
+            res.send({ message: "item has been saved in WareHouse", uz: "Ma'lumot muvofiqlik saqlandi" });
         }
     } catch (e) {
         errorHandle(res, e.message);

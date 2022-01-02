@@ -12,6 +12,7 @@ const { cardOfHomeRouter } = require('./routers/cardOfHomeRouter');
 const { wareHouseRouter } = require('./routers/wareHouseRouter');
 const { tradingPointRouter } = require('./routers/tradingPointRouter');
 const { lendDebtRouter } = require('./routers/lendDebtRouter');
+const { bazaarRouter } = require('./routers/bazaarRouter');
 
 
 
@@ -26,6 +27,7 @@ app.use('/api/cardhome', checkUser, cardOfHomeRouter);
 app.use('/api/warehouse', checkUser, wareHouseRouter);
 app.use('/api/trading', checkUser, tradingPointRouter);
 app.use('/api/lend', checkUser, lendDebtRouter);
+app.use('/api/bazaar', checkUser, bazaarRouter);
 
 
 
