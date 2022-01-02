@@ -13,12 +13,12 @@ async function lendDebtWareHouse(req, res) {
             if (item.totalDebt === 0) res.send({ message: "have not debt", uz: "Qarz mavjud emas" });
             else {
                 lastDebt = Number(lastDebt);
-                let totalLeadDebt = item.totalLeadDebt - lastDebt;
-                if (isFloat(totalLeadDebt)) totalLeadDebt = toFixed(totalLeadDebt);
-                if (totalLeadDebt < 0) res.send({ message: "you lend more then your debt", uz: "Qarzingizdan ko'proq summa to'ladingiz bu malumot saqlanmaydi. Iltimos tekshirib qaytadan urinib ko'ring" });
+                let totalRemainDebt = item.totalRemainDebt - lastDebt;
+                if (isFloat(totalRemainDebt)) totalRemainDebt = toFixed(totalRemainDebt);
+                if (totalRemainDebt < 0) res.send({ message: "you lend more then your debt", uz: "Qarzingizdan ko'proq summa to'ladingiz bu malumot saqlanmaydi. Iltimos tekshirib qaytadan urinib ko'ring" });
                 else {
                     const updateItems = await WareHouseModel.findByIdAndUpdate(item._id, {
-                        totalLeadDebt,
+                        totalRemainDebt,
                         lastDebt: lastDebt || item.lastDebt,
                         lastLendDebtDate: formatDate("mm/dd/yyyy")
                     });
@@ -49,12 +49,12 @@ async function lendDebtTradingPoint(req, res) {
             if (item.totalDebt === 0) res.send({ message: "have not debt", uz: "Qarz mavjud emas" });
             else {
                 lastDebt = Number(lastDebt);
-                let totalLeadDebt = item.totalLeadDebt - lastDebt;
-                if (isFloat(totalLeadDebt)) totalLeadDebt = toFixed(totalLeadDebt);
-                if (totalLeadDebt < 0) res.send({ message: "you lend more then your debt", uz: "Qarzingizdan ko'proq summa to'ladingiz bu malumot saqlanmaydi. Iltimos tekshirib qaytadan urinib ko'ring" });
+                let totalRemainDebt = item.totalRemainDebt - lastDebt;
+                if (isFloat(totalRemainDebt)) totalRemainDebt = toFixed(totalRemainDebt);
+                if (totalRemainDebt < 0) res.send({ message: "you lend more then your debt", uz: "Qarzingizdan ko'proq summa to'ladingiz bu malumot saqlanmaydi. Iltimos tekshirib qaytadan urinib ko'ring" });
                 else {
                     const updateItems = await TradingPointModel.findByIdAndUpdate(productId, {
-                        totalLeadDebt,
+                        totalRemainDebt,
                         lastDebt: lastDebt || item.lastDebt,
                         lastLendDebtDate: formatDate("mm/dd/yyyy")
                     });

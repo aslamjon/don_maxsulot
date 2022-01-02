@@ -5,8 +5,8 @@ const { errorHandle, formatDate, getTime, isFloat, toFixed } = require('./../uti
 
 async function createTradingPoint(req, res) {
     try {
-        let { typeOfProduct, kg, sellingPrice, isDebt } = req.body;
-        if (!typeOfProduct && !kg && !sellingPrice && isDebt && isNumber(kg) && isNumber(sellingPrice)) res.status(400).send({ message: "Bad request" });
+        let { typeOfProduct, kg, sellingPrice, isDebt, toWhom } = req.body;
+        if (!typeOfProduct && !kg && !sellingPrice && toWhom && isDebt && isNumber(kg) && isNumber(sellingPrice)) res.status(400).send({ message: "Bad request" });
         else {
             const product = await WareHouseModel.findOne({ typeOfProduct });
             if (product) {
@@ -30,7 +30,8 @@ async function createTradingPoint(req, res) {
                         datePublished: formatDate("mm/dd/yyyy"),
                         timePublished: getTime(24),
                         totalDebt,
-                        totalLeadDebt: totalDebt
+                        totalRemainDebt: totalDebt,
+                        toWhom
                     });
                     product.currentlyKg = isRight;
                     await product.save();

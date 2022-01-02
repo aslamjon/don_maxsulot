@@ -25,7 +25,7 @@ async function createWareHouse(req, res) {
                     datePublished: formatDate("mm/dd/yyyy"),
                     timePublished: getTime(24),
                     totalDebt,
-                    totalLeadDebt: totalDebt
+                    totalRemainDebt: totalDebt
                 });
                 await wareHouse.save();
                 res.send({ message: "item has been saved in WareHouse", uz: "Ma'lumot muvofiqlik saqlandi" });

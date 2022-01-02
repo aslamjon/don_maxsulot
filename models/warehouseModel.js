@@ -34,7 +34,7 @@ const schema = new Schema({
         type: Number,
         default: 0
     },
-    totalLeadDebt: {
+    totalRemainDebt: {
         type: Number,
         default: 0
     },
