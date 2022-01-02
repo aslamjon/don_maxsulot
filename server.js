@@ -10,6 +10,8 @@ const { userRouter } = require('./routers/userRouter');
 const { authRouter } = require('./routers/authRouter');
 const { cardOfHomeRouter } = require('./routers/cardOfHomeRouter');
 const { wareHouseRouter } = require('./routers/wareHouseRouter');
+const { tradingPointRouter } = require('./routers/tradingPointRouter');
+const { lendDebtRouter } = require('./routers/lendDebtRouter');
 
 
 
@@ -22,6 +24,8 @@ app.use('/auth', authRouter);
 app.use('/api/user', checkUser, userRouter);
 app.use('/api/cardhome', checkUser, cardOfHomeRouter);
 app.use('/api/warehouse', checkUser, wareHouseRouter);
+app.use('/api/trading', checkUser, tradingPointRouter);
+app.use('/api/lend', checkUser, lendDebtRouter);
 
 
 

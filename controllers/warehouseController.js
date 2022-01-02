@@ -7,8 +7,8 @@ async function createWareHouse(req, res) {
         let { typeOfProduct, kg, price, isDebt } = req.body;
         if (!typeOfProduct && !kg && !price && isDebt && isNumber(kg) && isNumber(price)) res.status(400).send({ message: "Bad request" });
         else {
-            const getItem = WareHouseModel.find({ typeOfProduct });
-            if (getItem) res.send({ message: "product is already created", uz: "Mahsulot alaqachon omborda mavjud" });
+            const getItem = await WareHouseModel.find({ typeOfProduct });
+            if (!isEmpty(getItem)) res.send({ message: "product is already created", uz: "Mahsulot alaqachon omborda mavjud" });
             else {
                 let totalDebt = 0;
                 kg = toFixed(kg);
@@ -59,35 +59,8 @@ async function getWareHouse(req, res) {
     try {
         const { id } = req.params;
         const items = await WareHouseModel.findById(id);
-        res.send(items);
-    } catch (e) {
-        errorHandle(res, e.message);
-    }
-}
-
-async function lendDebt(req, res) {
-    try {
-        const { id } = req.params;
-        let { lastDebt } = req.body;
-        const item = await WareHouseModel.findById(id);
-        if (isEmpty(item) || !lastDebt) res.statsu(404).send({ message: "Item not found", uz: "Ma'lumot topilmadi" });
-        else {
-            if (item.totalDebt === 0) res.send({ message: "have not debt", uz: "Qarz mavjud emas" });
-            else {
-                lastDebt = Number(lastDebt);
-                let totalLeadDebt = item.totalLeadDebt - lastDebt;
-                if (isFloat(totalLeadDebt)) totalLeadDebt = toFixed(totalLeadDebt);
-                if (totalLeadDebt < 0) res.send({ message: "you lend more then your debt", uz: "Qarzingizdan ko'proq summa to'ladingiz bu malumot saqlanmaydi. Iltimos tekshirib qaytadan urinib ko'ring" });
-                else {
-                    const updateItems = await WareHouseModel.findByIdAndUpdate(id, {
-                        totalLeadDebt,
-                        lastDebt: lastDebt || item.lastDebt,
-                        lastLendDebtDate: formatDate("mm/dd/yyyy")
-                    });
-                    res.send({ message: "data has been updated", uz: "Ma'lumot muvofiqlik yangilandi" });
-                }
-            }
-        }
+        if (!items) res.status(404).send({ message: "data not found", uz: "Ma'lumot topilmadi" });
+        else res.send(items);
     } catch (e) {
         errorHandle(res, e.message);
     }
@@ -131,6 +104,5 @@ module.exports = {
     getWareHouses,
     getWareHouse,
     updateWareHouse,
-    deleteWareHouse,
-    lendDebt
+    deleteWareHouse
 }
