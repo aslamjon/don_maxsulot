@@ -1,5 +1,6 @@
 const { UserModel } = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const { isEmpty } = require("lodash");
 
 async function createUser(req, res) {
     const { username, password, role } = req.body;
@@ -37,7 +38,19 @@ async function getMe(req, res) {
     }
 }
 
+async function isThere(req, res) {
+    try {
+        const { username } = req.body;
+        const user = await UserModel.find({ username });
+        if (!isEmpty(user)) res.send({ registered: true, hasPassword: true });
+        else res.send({ registered: false, hasPassword: false });
+    } catch (err) {
+        throw err.message;
+    }
+}
+
 module.exports = {
     createUser,
-    getMe
+    getMe,
+    isThere
 }

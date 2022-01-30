@@ -21,8 +21,8 @@ require("dotenv").config();
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ extended: true })) // if json come backend then it convert to obj in req.body
 
-app.use('/auth', authRouter);
-app.use('/api/user', checkUser, userRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 app.use('/api/cardhome', checkUser, cardOfHomeRouter);
 app.use('/api/warehouse', checkUser, wareHouseRouter);
 app.use('/api/trading', checkUser, tradingPointRouter);
