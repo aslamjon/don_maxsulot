@@ -1,6 +1,6 @@
 const { isNumber, isEmpty } = require("lodash");
 const { WareHouseModel } = require("../models/warehouseModel");
-const { errorHandle, formatDate, getTime, isFloat, toFixed } = require('./../utiles');
+const { errorHandle, formatDate, getTime, isFloat, toFixed } = require('../utils/utiles');
 
 async function createWareHouse(req, res) {
     try {

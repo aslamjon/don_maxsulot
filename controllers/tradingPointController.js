@@ -1,7 +1,7 @@
 const { isNumber, isEmpty } = require("lodash");
 const { TradingPointModel } = require("../models/tradingPointModel");
 const { WareHouseModel } = require("../models/warehouseModel");
-const { errorHandle, formatDate, getTime, isFloat, toFixed } = require('./../utiles');
+const { errorHandle, formatDate, getTime, isFloat, toFixed } = require('../utils/utiles');
 
 async function createTradingPoint(req, res) {
     try {
