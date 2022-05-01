@@ -1,7 +1,7 @@
 const { isEmpty } = require("lodash");
 const path = require("path");
 const { CardOfHomeModel } = require("../models/cardOfHomeModel");
-const { saveImgs, errorHandle, unlink } = require('./../utiles');
+const { saveImgs, errorHandle, unlink } = require('../utils/utiles');
 
 async function createHomeCard(req, res) {
     const { title, description, price, showToAgent } = req.body;

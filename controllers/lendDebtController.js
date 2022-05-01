@@ -2,7 +2,7 @@ const { isEmpty } = require("lodash");
 const { LendDebtModel } = require("../models/lendDebtModel");
 const { WareHouseModel } = require("../models/warehouseModel");
 const { TradingPointModel } = require("../models/tradingPointModel");
-const { formatDate, getTime, toFixed, isFloat, errorHandle } = require("../utiles");
+const { formatDate, getTime, toFixed, isFloat, errorHandle } = require("../utils/utiles");
 
 async function lendDebtWareHouse(req, res) {
     try {

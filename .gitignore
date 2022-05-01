@@ -4,3 +4,4 @@ data/images/*
 !data/images/avatar.jpg
 package-lock.json
 data/logger.json
+app.log
