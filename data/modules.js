@@ -7,22 +7,22 @@ const modules = [
         departments: [
             {
                 id: 7,
-                name: "",
+                name: "sales",
                 orderIndex: 7,
                 title: "",
                 pages: [
                     {
-                    checked: false,
-                    id: 44,
-                    name: "Bozor",
-                    title: "Bozor"
-                },
+                        checked: false,
+                        id: 44,
+                        name: "bozor",
+                        title: "Bozor"
+                    },
                     {
-                    checked: false,
-                    id: 45,
-                    name: "Magazinlar",
-                    title: "Magazinlar"
-                },
+                        checked: false,
+                        id: 45,
+                        name: "magazinlar",
+                        title: "Magazinlar"
+                    },
                 ]
             }
         ]
@@ -35,15 +35,24 @@ const modules = [
         departments: [
             {
                 id: 7,
-                name: "",
+                name: "ombor",
                 orderIndex: 7,
                 title: "",
-                pages: [{
-                    checked: false,
-                    id: 44,
-                    name: "Omborlar",
-                    title: "omborlar"
-                }]
+                pages: [
+                    {
+                        checked: false,
+                        id: 45,
+                        name: "filial",
+                        title: "Filial"
+                    },
+                    {
+                        checked: false,
+                        id: 44,
+                        name: "omborlar",
+                        title: "Omborlar"
+                    },
+
+                ]
             }
         ]
     },

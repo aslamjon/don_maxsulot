@@ -18,6 +18,7 @@ const { lendDebtRouter } = require('./routers/lendDebtRouter');
 const { bazaarRouter } = require('./routers/bazaarRouter');
 
 const logger = require('./utils/logger');
+const {branchRouter} = require("./routers/branchRouter");
 
 
 app.use(cors());
@@ -27,6 +28,7 @@ app.use(express.json({ extended: true })) // if json come backend then it conver
 
 app.use('/api/auth', authRouter);
 // app.use('/api/user', userRouter);
+app.use('/api/branch', checkUser, branchRouter);
 app.use('/api/cardhome', checkUser, cardOfHomeRouter);
 app.use('/api/warehouse', checkUser, wareHouseRouter);
 app.use('/api/trading', checkUser, tradingPointRouter);
@@ -51,7 +53,6 @@ app.use((err, req, res, next) => {
     })
     next();
 })
-
 
 const PORT = process.env.APP_PORT || 3000;
 app.listen(PORT, () => { logger.info(`Server is running on ${PORT}`); connectDb(); });

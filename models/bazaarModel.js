@@ -1,6 +1,10 @@
 const { Schema, model, Types } = require('mongoose');
 
 const schema = new Schema({
+    branchId: {
+      type: Types.ObjectId,
+      required: true
+    },
     typeOfProduct: {
         type: String,
         required: true,

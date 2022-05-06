@@ -1,12 +1,12 @@
 const { Router } = require("express");
-const { createWareHouse, getWareHouses, getWareHouse, updateWareHouse, deleteWareHouse } = require("../controllers/warehouseController");
+const { createWareHouse, getAllWareHouses, getAllWareHousesByIds, updateWareHouse, deleteWareHouse } = require("../controllers/warehouseController");
 
 const router = Router();
 
-router.get('/', getWareHouses);
-router.get('/:id', getWareHouse);
+router.get('/', getAllWareHouses);
+router.post('/branch', getAllWareHousesByIds);
 router.post('/', createWareHouse);
-router.put('/:id', updateWareHouse);
+router.put('/', updateWareHouse);
 router.delete('/:id', deleteWareHouse);
 
 module.exports = {

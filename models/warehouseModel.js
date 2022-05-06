@@ -1,10 +1,13 @@
 const { Schema, model, Types } = require('mongoose');
 
 const schema = new Schema({
-    typeOfProduct: {
+    branchId: {
+        type: Types.ObjectId,
+        required: true
+    },
+    productName: {
         type: String,
         required: true,
-        unique: true
     },
     kg: {
         type: Number,
@@ -18,26 +21,6 @@ const schema = new Schema({
         type: Number,
         required: true
     },
-    datePublished: {
-        type: String,
-        required: true
-    },
-    timePublished: {
-        type: String,
-        required: true
-    },
-    modifiedDate: {
-        type: String,
-        default: ''
-    },
-    modifiedTime: {
-        type: String,
-        default: ''
-    },
-    isChanged: {
-        type: Boolean,
-        default: false
-    },
     totalDebt: {
         type: Number,
         default: 0
@@ -46,20 +29,83 @@ const schema = new Schema({
         type: Number,
         default: 0
     },
-    lastDebt: {
-        type: Number,
-        default: 0
-    },
-    lastLendDebtDate: {
-        type: String,
-        default: ''
+    lastLendDebtId: {
+        type: Types.ObjectId,
     },
     byWhom: {
         type: String,
         required: true
+    },
+
+    createdById: {
+        type: Types.ObjectId,
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updated: {
+        type: Boolean,
+        default: false
+    },
+    updatedAt: {
+        type: Date,
+    },
+    updatedById: {
+        type: Types.ObjectId,
+    },
+    deleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: {
+        type: Date,
+    },
+    deletedById: {
+        type: Types.ObjectId,
+    }
+})
+
+
+const updateSchema = new Schema({
+    productName: {
+        type: String,
+    },
+    dataId: {
+      type: Types.ObjectId
+    },
+    kg: {
+        type: Number,
+    },
+    currentlyKg: {
+        type: Number,
+    },
+    price: {
+        type: Number,
+    },
+    totalDebt: {
+        type: Number,
+    },
+    totalRemainDebt: {
+        type: Number,
+    },
+    lastLendDebtId: {
+        type: Types.ObjectId,
+    },
+    byWhom: {
+        type: String,
+    },
+
+    updatedAt: {
+        type: Date,
+    },
+    updatedById: {
+        type: Types.ObjectId,
     }
 })
 
 module.exports = {
-    WareHouseModel: model('WareHouse', schema)
+    WareHouseModel: model('WareHouse', schema),
+    UpdateWareHouseModel: model('WareHouseUpdate', updateSchema),
 }

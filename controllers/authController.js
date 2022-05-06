@@ -6,6 +6,7 @@ const {UserModel} = require("../models/userModel");
 const logger = require("../utils/logger");
 const {errors} = require("../utils/constants");
 const modules = require("../data/modules");
+const {hideFields} = require("../utils/utiles");
 
 const fileName = require('path').basename(__filename);
 
@@ -46,11 +47,11 @@ const login = async (req, res) => {
 }
 
 const createUser = async (req, res) => {
-    const {phoneNumber, password, prePassword, role} = req.body;
+    const { phoneNumber, password, prePassword } = req.body;
     const secret = process.env.SALT;
 
     if (!phoneNumber.startsWith("+998")) return res.status(400).send({ message: "phoneNumber error" });
-    if (password !== prePassword) return res.status(400).send({ message: "check password and try again" });
+    if (password !== prePassword) return res.status(400).send({ message: "check password and prePassword then try again" });
 
     const phoneNumberExists = await UserModel.findOne({phoneNumber});
     if (phoneNumberExists) {
@@ -93,7 +94,7 @@ const createUser = async (req, res) => {
 
 const me = async (req, res) => {
     try {
-        const user = await UserModel.findOne({_id: req.user.userId});
+        const user = await UserModel.findById(req.user.userId, hideFields());
         res.send({
             data: { ...user._doc, modules }
         });

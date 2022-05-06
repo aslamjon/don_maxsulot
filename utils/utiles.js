@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require("path");
 const _ = require('lodash');
+const {Types} = require("mongoose");
+const {errors} = require("./constants");
+const logger = require("./logger");
+const {WareHouseModel} = require("../models/warehouseModel");
+
 let logData = []
 try {
     logData = require('./data/logger.json');
@@ -226,6 +231,8 @@ function getTime(format = 24, date = new Date()) {
     else return date.toLocaleString().split(" ")[1];
 }
 
+// ********************************************************
+
 function isInt(n) {
     return Number(n) === n && n % 1 === 0;
 }
@@ -238,17 +245,38 @@ function toFixed(number, n = 2) {
     return Number(Number(number).toFixed(n));
 }
 
-function logger(text, { status = "INFO", filename = "./data/logger.json", res = '' }) {
-    logData.push({ [status]: text, date: `${formatDate('mm/dd/yyyy')} ${getTime()}` });
-    if (res) res.status(500).send({ message: "Something wrong!" });
-    fs.writeFile(filename, JSON.stringify(logData, null, 4), 'utf8', (err) => {
-        if (err) console.log(err);
-    });
+// function logger(text, { status = "INFO", filename = "./data/logger.json", res = '' }) {
+//     logData.push({ [status]: text, date: `${formatDate('mm/dd/yyyy')} ${getTime()}` });
+//     if (res) res.status(500).send({ message: "Something wrong!" });
+//     fs.writeFile(filename, JSON.stringify(logData, null, 4), 'utf8', (err) => {
+//         if (err) console.log(err);
+//     });
+// }
+
+
+const errorHandling = (e, functionName, res, fileName) => {
+    logger.error(`${e.message} -> ${fileName} -> ${functionName}`);
+    errors.SERVER_ERROR(res);
 }
 
-function errorHandle(res, message, status = 500) {
-    logger(`${message}`, { status: 'ERROR', res });
-    res.status(status).send({ message });
+const hideFields = (items = {}) => ({ deleted: 0, deletedAt: 0, deletedById: 0, updatedById: 0, updated: 0, __v: 0, password: 0, ...items });
+
+const getDataFromModelByQuery = ({ Model, hideFieldQuery = {}, query = {}, withDelete = false}) => Model.find(withDelete ? query : {...query, deleted: {$eq: false}}, hideFields(hideFieldQuery));
+const getOneFromModelByQuery = ({ Model, hideFieldQuery = {}, query = {}, withDelete = false}) => Model.findOne(withDelete ? query : {...query, deleted: {$eq: false}}, hideFields(hideFieldQuery));
+
+const getTimes = () => new Date().getTime();
+
+const deleteFormat = ({ item = {}, id }) => {
+    item.deleted = true;
+    item.deletedAt = getTimes();
+    item.deletedById = Types.ObjectId(id);
+    return item;
+}
+const updateFormat = ({ item = {}, id }) => {
+    item.updated = true;
+    item.updatedAt = getTimes();
+    item.updatedById = Types.ObjectId(id);
+    return item;
 }
 
 // ********************************************************
@@ -258,8 +286,7 @@ module.exports = {
     unlink,
     saveImg,
     saveImgs,
-    logger,
-    errorHandle,
+    errorHandling,
     isInt,
     isFloat,
     toFixed,
@@ -268,5 +295,11 @@ module.exports = {
     formatDate,
     ISODate,
     setYear,
-    getTime
+    getTime,
+    getTimes,
+    hideFields,
+    getDataFromModelByQuery,
+    getOneFromModelByQuery,
+    deleteFormat,
+    updateFormat
 }
